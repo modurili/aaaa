@@ -15,7 +15,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <style>
 /* ── ACCENT COLORS ── */
-:root { --accent:#4f6ef7; --accent2:#7c3aed; }
+:root { --accent:#5bb88a; --accent2:#3da66e; }
 
 [data-theme="dark"] {
   --bg:#121212; --bg2:#1a1a1a; --bg3:#202020; --bg4:#242424;
@@ -68,8 +68,13 @@ a { color:var(--accent); text-decoration:none; }
 
 /* ── HOME PAGE ── */
 #pg-home { display:flex; flex-direction:column; height:100%; overflow:hidden; }
-.home-scroll { flex:1; overflow-y:auto; padding:12px 14px 16px; }
+.home-scroll { flex:1; overflow-y:auto; padding:12px 14px 10px; }
 .home-scroll::-webkit-scrollbar { width:0; }
+/* Sticky paste bar at bottom of home */
+.home-paste-bar { flex-shrink:0; padding:10px 14px; padding-bottom:max(12px,env(safe-area-inset-bottom)); background:var(--bg); border-top:1px solid var(--border); }
+.paste-btn { width:100%; padding:14px; border-radius:var(--rs); background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; font-family:'Syne',sans-serif; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .15s; box-shadow:0 4px 18px color-mix(in srgb,var(--accent) 35%,transparent); }
+.paste-btn:active { opacity:.88; transform:scale(.98); }
+.paste-hint { font-size:11px; color:var(--text3); margin-top:6px; text-align:center; line-height:1.5; }
 
 /* Date bar */
 .date-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
@@ -78,23 +83,16 @@ a { color:var(--accent); text-decoration:none; }
 .btn-nutrient-sel { background:var(--bg2); border:1px solid var(--border); border-radius:20px; padding:5px 12px; font-size:11px; font-family:'Syne',sans-serif; font-weight:700; color:var(--text2); transition:all .15s; display:flex; align-items:center; gap:5px; }
 .btn-nutrient-sel:active { color:var(--accent); border-color:var(--accent); }
 
-/* Paste card */
-.paste-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); padding:14px; margin-bottom:10px; box-shadow:var(--sh2); }
-.paste-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
-.paste-btn { width:100%; padding:13px; border-radius:var(--rs); background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; font-family:'Syne',sans-serif; font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .15s; box-shadow:0 4px 18px color-mix(in srgb,var(--accent) 35%,transparent); }
-.paste-btn:active { opacity:.88; transform:scale(.98); }
-.paste-hint { font-size:11px; color:var(--text3); margin-top:8px; text-align:center; line-height:1.5; }
-
 /* Gauge card */
-.gauge-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; box-shadow:var(--sh2); }
+.gauge-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--sh2); }
 .gauge-header { padding:12px 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
 .gauge-title { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:var(--text); }
 .gauge-date-badge { font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); background:var(--bg3); padding:3px 9px; border-radius:10px; }
 .gauge-tabs { display:flex; border-bottom:1px solid var(--border); }
 .gtab { flex:1; background:none; border:none; padding:10px 0; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.05em; color:var(--text3); border-bottom:2px solid transparent; transition:all .15s; }
 .gtab.active { color:var(--accent); border-bottom-color:var(--accent); }
-.gauge-body { padding:14px; }
-canvas { max-width:100%; }
+.gauge-body { padding:12px 10px 8px; overflow-x:auto; }
+canvas { display:block; }
 .no-data-msg { text-align:center; padding:36px 20px; color:var(--text3); font-size:13px; line-height:1.7; }
 .gauge-legend { display:flex; gap:12px; flex-wrap:wrap; padding:8px 14px 10px; font-family:'DM Mono',monospace; font-size:10px; color:var(--text3); border-top:1px solid var(--border); }
 .lg-item { display:flex; align-items:center; gap:5px; }
@@ -308,14 +306,6 @@ canvas { max-width:100%; }
             表示栄養素
           </button>
         </div>
-        <div class="paste-card">
-          <div class="paste-label">Gemini出力を貼り付けて記録</div>
-          <button class="paste-btn" onclick="pasteAndRecord()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="10" height="5" rx="1"/><path d="M3 7h18v15H3z" rx="2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-            クリップボードから記録
-          </button>
-          <div class="paste-hint">Geminiの回答（カンマ区切り・20項目）をコピーしてからタップ</div>
-        </div>
         <div class="gauge-card" id="gaugeCard">
           <div class="gauge-header">
             <span class="gauge-title">今日の達成状況</span>
@@ -330,7 +320,7 @@ canvas { max-width:100%; }
             <div style="position:relative">
               <canvas id="gaugeChart" style="display:none"></canvas>
             </div>
-            <div class="no-data-msg" id="noDataMsg">記録がありません<br>上のボタンから食事を記録してください</div>
+            <div class="no-data-msg" id="noDataMsg">記録がありません<br>下のボタンから食事を記録してください</div>
           </div>
           <div class="gauge-legend">
             <div class="lg-item"><div class="lg-dot lg-blue"></div>80%未満</div>
@@ -338,6 +328,14 @@ canvas { max-width:100%; }
             <div class="lg-item"><div class="lg-dot lg-orange"></div>100%超過</div>
           </div>
         </div>
+      </div>
+      <!-- Sticky paste button at bottom -->
+      <div class="home-paste-bar">
+        <button class="paste-btn" onclick="pasteAndRecord()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="10" height="5" rx="1"/><path d="M3 7h18v15H3z"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+          クリップボードから記録
+        </button>
+        <div class="paste-hint">Geminiの回答（カンマ区切り・20項目）をコピーしてからタップ</div>
       </div>
     </div>
 
@@ -625,17 +623,17 @@ const CHANGELOG=[
 ];
 const CURRENT_VERSION=CHANGELOG[0].v;
 
-// ── ACCENT COLORS ──
+// ── ACCENT COLORS (same as ねむろく) ──
 const ACCENTS={
-  indigo:{hex:'#4f6ef7',hex2:'#7c3aed'},
+  green: {hex:'#5bb88a',hex2:'#3da66e'},
   teal:  {hex:'#4ec9c0',hex2:'#2da09a'},
-  green: {hex:'#10b981',hex2:'#059669'},
-  rose:  {hex:'#f43f5e',hex2:'#e11d48'},
-  amber: {hex:'#f59e0b',hex2:'#d97706'},
-  violet:{hex:'#8b5cf6',hex2:'#7c3aed'},
+  blue:  {hex:'#5b96d4',hex2:'#4a88cc'},
+  purple:{hex:'#9b7de0',hex2:'#7a5acc'},
+  rose:  {hex:'#e06fa0',hex2:'#c05880'},
+  orange:{hex:'#e08050',hex2:'#c06830'},
 };
-const ACCENT_ORDER=['indigo','teal','green','rose','amber','violet'];
-let currentAccent=localStorage.getItem('nl_accent')||'indigo';
+const ACCENT_ORDER=['green','teal','blue','purple','rose','orange'];
+let currentAccent=localStorage.getItem('nl_accent')||'green';
 
 function applyAccent(name,persist=true){
   currentAccent=name;
@@ -822,18 +820,22 @@ function renderGauge(){
   const gridC=isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)';
   const tickC=isDark?'#7a7a7a':'#6b7280';
 
-  // FIX: Per-nutrient x-axis max based on each nutrient's own target or actual value
-  // Use a single chart but set suggestedMax per dataset item dynamically via custom plugin
-  // Actually Chart.js bar supports only one scale, so we normalize to percentage (0-100%)
-  // and label accordingly
   const pctVals=catNutrients.map((_,i)=>{
     const t=tgtVals[i];const v=vals[i];
     if(t===0)return v>0?100:0;
     return Math.min(+(v/t*100).toFixed(1),200);
   });
 
-  const ht=Math.max(160,catNutrients.length*44+60);
+  // Fix: set canvas width from parent container
+  const bodyEl=canvas.parentElement.parentElement;
+  const canvasW=bodyEl.clientWidth-20;
+  canvas.width=canvasW>0?canvasW:340;
+
+  // Fix 1: Each bar gets fixed 52px row height — canvas grows with count, never squishes
+  const ROW_H=52;
+  const ht=catNutrients.length*ROW_H+40;
   canvas.height=ht;
+  canvas.style.height=ht+'px';
 
   if(gaugeChart){gaugeChart.destroy();gaugeChart=null;}
 
@@ -846,13 +848,15 @@ function renderGauge(){
         data:pctVals,
         backgroundColor:colors,
         borderRadius:5,
-        barThickness:16,
+        barThickness:18,  // fixed px — never compress
+        minBarLength:2,
       }]
     },
     options:{
       indexAxis:'y',
-      responsive:true,
+      responsive:false,   // Fix 2: disable responsive so explicit height is respected
       maintainAspectRatio:false,
+      layout:{padding:{top:4,bottom:4}},
       plugins:{
         legend:{display:false},
         tooltip:{
@@ -871,15 +875,21 @@ function renderGauge(){
         x:{
           min:0,max:120,
           grid:{color:gridC},
-          ticks:{
-            color:tickC,
-            font:{size:10},
-            callback:v=>v+'%'
-          }
+          ticks:{color:tickC,font:{size:10},callback:v=>v+'%'}
         },
         y:{
           grid:{display:false},
-          ticks:{color:tickC,font:{size:11}}
+          // Fix 3: fixed left padding so all bars start at the same x regardless of label length
+          afterFit(scale){scale.width=130;},
+          ticks:{
+            color:tickC,
+            font:{size:11},
+            // Truncate long labels to prevent overflow
+            callback(val){
+              const lbl=this.getLabelForValue(val);
+              return lbl.length>10?lbl.slice(0,10)+'…':lbl;
+            }
+          }
         }
       }
     }
