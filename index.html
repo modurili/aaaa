@@ -110,6 +110,8 @@ canvas { display:block; }
 .eib:active { transform:scale(.88); }
 .eib.ed:active { color:var(--accent); border-color:color-mix(in srgb,var(--accent) 40%,transparent); }
 .eib.dl:active { color:var(--del); border-color:rgba(255,92,92,.3); }
+.eib.lo:active { color:#f59e0b; border-color:rgba(245,158,11,.35); }
+.leftover-tag { font-family:'DM Mono',monospace; font-size:9px; color:#f59e0b; background:rgba(245,158,11,.12); padding:1px 6px; border-radius:6px; margin-left:4px; }
 .empty-state { text-align:center; padding:56px 20px; color:var(--text3); font-size:13px; line-height:1.8; }
 .rec-fab { position:absolute; right:14px; bottom:calc(8px + env(safe-area-inset-bottom)); width:44px; height:44px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; color:#fff; box-shadow:0 3px 14px color-mix(in srgb,var(--accent) 45%,transparent); transition:all .2s; z-index:6; }
 .rec-fab:active { transform:scale(.94); }
@@ -213,6 +215,19 @@ canvas { display:block; }
 .bulk-custom-row { display:flex; gap:6px; align-items:center; margin-top:8px; }
 .bulk-custom-in { width:70px; background:var(--bg2); border:1px solid var(--border2); border-radius:8px; padding:5px 8px; font-size:13px; color:var(--text); outline:none; }
 .nutrient-check-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:0 14px 12px; }
+
+/* LEFTOVER CORRECTION */
+.leftover-info { margin:0 14px 12px; padding:10px 12px; background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.25); border-radius:10px; font-size:12px; color:var(--text2); line-height:1.6; }
+.leftover-info strong { color:#f59e0b; }
+.leftover-steps { margin:0 14px 12px; display:flex; flex-direction:column; gap:10px; }
+.leftover-step { display:flex; gap:10px; }
+.leftover-step-num { width:22px; height:22px; border-radius:50%; background:var(--bg3); border:1.5px solid var(--border2); display:flex; align-items:center; justify-content:center; font-family:'DM Mono',monospace; font-size:11px; font-weight:700; color:var(--text2); flex-shrink:0; }
+.leftover-step-body { flex:1; }
+.leftover-step-title { font-size:12.5px; font-weight:700; color:var(--text); margin-bottom:2px; }
+.leftover-step-desc { font-size:11.5px; color:var(--text3); line-height:1.55; }
+.leftover-manual-toggle { display:flex; align-items:center; justify-content:center; gap:6px; margin:0 14px 10px; padding:9px; border-radius:10px; background:var(--bg3); font-size:12px; color:var(--text2); cursor:pointer; transition:background .15s; }
+.leftover-manual-toggle:active { background:var(--bg4); }
+.leftover-manual-toggle.open #leftoverManualChevron { transform:rotate(90deg); }
 .nc-item { display:flex; align-items:center; gap:8px; padding:8px 10px; background:var(--bg3); border-radius:10px; font-size:13px; cursor:pointer; }
 .nc-item input[type=checkbox] { accent-color:var(--accent); width:16px; height:16px; cursor:pointer; }
 .targets-scroll { max-height:50vh; overflow-y:auto; margin:0 14px; }
@@ -442,6 +457,41 @@ canvas { display:block; }
   <button class="dr-ok" onclick="saveEdit()">保存する</button>
 </div>
 
+<!-- LEFTOVER CORRECTION DRAWER -->
+<div class="dr" id="drLeftover">
+  <div class="dr-handle"></div>
+  <div class="dr-ti">食べ残し補正</div>
+  <div class="leftover-info" id="leftoverInfo"></div>
+  <div class="leftover-steps">
+    <div class="leftover-step">
+      <div class="leftover-step-num">1</div>
+      <div class="leftover-step-body">
+        <div class="leftover-step-title">食べ残しの写真をGeminiへ</div>
+        <div class="leftover-step-desc">残った食事の写真を撮り、Geminiに「この食べ残しの栄養素を20項目（カロリー〜水分）でカンマ区切りで教えて」と聞いてください。</div>
+      </div>
+    </div>
+    <div class="leftover-step">
+      <div class="leftover-step-num">2</div>
+      <div class="leftover-step-body">
+        <div class="leftover-step-title">回答をコピーしてワンタップ</div>
+        <div class="leftover-step-desc">Geminiの回答（カンマ区切り20項目）をコピーしたら、下のボタンを押すだけで元の記録から自動的に差し引かれます。</div>
+      </div>
+    </div>
+  </div>
+  <button class="paste-btn" id="leftoverPasteBtn" style="margin:0 14px 10px;width:calc(100% - 28px)" onclick="pasteLeftoverAndApply()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="10" height="5" rx="1"/><path d="M3 7h18v15H3z"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+    クリップボードから食べ残し分を補正
+  </button>
+  <div class="leftover-manual-toggle" onclick="toggleLeftoverManual()">
+    <span id="leftoverManualLbl">手動で入力する</span>
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="leftoverManualChevron"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>
+  <div id="leftoverManualSection" style="display:none">
+    <div class="dr-grid" id="leftoverGrid"></div>
+    <button class="dr-ok" onclick="applyLeftoverManual()">この食べ残し量を差し引く</button>
+  </div>
+</div>
+
 <!-- NUTRIENT DRAWER -->
 <div class="dr" id="drNutrient">
   <div class="dr-handle"></div>
@@ -532,6 +582,7 @@ const SIMPLE_TARGETS={
   }
 };
 const CHANGELOG=[
+  {v:'2.2.0',note:'食べ残し補正機能を追加。食べ残しの写真をGeminiで分析し、その結果をワンタップで貼り付けると元の記録から自動的に差し引かれます。記録一覧の並び順を新しい記録が上にくるよう修正。'},
   {v:'2.1.0',note:'グラフ視認性向上（テキスト色・アクセントカラー適用）。栄養素を「目標に近づける」「上限を超えない」の2タイプに分類し、グラフの色分けとUIを最適化。日曜/月曜始まり設定をマイページに追加。PWAマニフェストを動的生成に対応。'},
   {v:'2.0.0',note:'UI完全刷新。ねむろく風デザイン採用。クリップボード記録、SVGアイコン統一、PWA対応、アクセントカラー選択（ねむろく同色6色）、マイページ強化、バージョン履歴追加。'},
   {v:'1.0.0',note:'初期リリース。テキスト貼り付けによる食事記録、20栄養素管理、水平ゲージ表示、CSV入出力、ライト/ダークテーマ。'},
@@ -691,6 +742,76 @@ function saveEdit(){
     addMealEntry(values,timeVal);
   }
   closeAllDr();renderRecords();renderGauge();
+}
+
+// ── LEFTOVER CORRECTION ──
+let leftoverTarget=null; // {date, id}
+function openLeftoverModal(date,id){
+  const entry=(mealData[date]||[]).find(e=>e.id===id);
+  if(!entry)return;
+  leftoverTarget={date,id};
+  const kcal=Math.round(entry.values[0]||0);
+  document.getElementById('leftoverInfo').innerHTML=`<strong>${date} ${entry.time}</strong> の記録（${kcal}kcal）から、食べ残し分を差し引きます。`;
+  document.getElementById('leftoverManualSection').style.display='none';
+  document.querySelector('.leftover-manual-toggle').classList.remove('open');
+  document.getElementById('leftoverManualLbl').textContent='手動で入力する';
+  buildLeftoverGrid();
+  showDr('drLeftover');
+}
+function toggleLeftoverManual(){
+  const sec=document.getElementById('leftoverManualSection');
+  const toggle=document.querySelector('.leftover-manual-toggle');
+  const open=sec.style.display==='block';
+  sec.style.display=open?'none':'block';
+  toggle.classList.toggle('open',!open);
+  document.getElementById('leftoverManualLbl').textContent=open?'手動で入力する':'閉じる';
+}
+function buildLeftoverGrid(vals,errorIdxs){
+  const grid=document.getElementById('leftoverGrid');grid.innerHTML='';
+  const v=vals||new Array(20).fill(0);
+  NUTRIENTS.forEach((n,i)=>{
+    const div=document.createElement('div');div.className='dr-field-sm';
+    const isErr=errorIdxs&&errorIdxs.includes(i);
+    div.innerHTML=`<label>${n.name}（${n.unit}）</label><input type="number" step="any" id="lf_${i}" value="${isNaN(v[i])?'':v[i]}" class="${isErr?'err':''}">`;
+    grid.appendChild(div);
+  });
+}
+function subtractLeftover(leftoverValues){
+  if(!leftoverTarget)return;
+  const entry=(mealData[leftoverTarget.date]||[]).find(e=>e.id===leftoverTarget.id);
+  if(!entry){toast('対象の記録が見つかりません');return;}
+  entry.values=entry.values.map((v,i)=>{
+    const remaining=v-(leftoverValues[i]||0);
+    return Math.max(0,+remaining.toFixed(2));
+  });
+  entry.corrected=true;
+  saveMealData();
+  closeAllDr();renderRecords();renderGauge();
+  toast('🍽 食べ残し分を補正しました');
+}
+async function pasteLeftoverAndApply(){
+  let text='';
+  try{ text=await navigator.clipboard.readText(); }
+  catch(e){ toast('クリップボードへのアクセスを許可してください');return; }
+  if(!text.trim()){toast('クリップボードが空です');return;}
+  const parts=text.split(',').map(s=>s.trim());
+  if(parts.length!==20){toast(`20項目が必要です（現在${parts.length}項目）`);return;}
+  const values=parts.map(parseFloat);
+  const errorIdxs=values.reduce((a,v,i)=>isNaN(v)?[...a,i]:a,[]);
+  if(errorIdxs.length>0){
+    // open manual section pre-filled with parsed values, highlight errors
+    document.getElementById('leftoverManualSection').style.display='block';
+    document.querySelector('.leftover-manual-toggle').classList.add('open');
+    document.getElementById('leftoverManualLbl').textContent='閉じる';
+    buildLeftoverGrid(values,errorIdxs);
+    toast('数値以外が含まれています。下のフォームで修正してください');
+    return;
+  }
+  subtractLeftover(values);
+}
+function applyLeftoverManual(){
+  const values=NUTRIENTS.map((_,i)=>parseFloat(document.getElementById('lf_'+i).value)||0);
+  subtractLeftover(values);
 }
 
 // ── GAUGE ──
@@ -896,10 +1017,11 @@ function renderRecords(){
     const dLabel=diff===0?'今日':diff===1?'昨日':`${MON[d.getMonth()]} ${d.getDate()}日 (${DAY[d.getDay()]})`;
     const hd=document.createElement('div');hd.className='rec-dg-hd';hd.textContent=dLabel;list.appendChild(hd);
     const card=document.createElement('div');card.className='entry-card';
-    [...entries].sort((a,b)=>a.time.localeCompare(b.time)).forEach(entry=>{
+    [...entries].sort((a,b)=>b.time.localeCompare(a.time)).forEach(entry=>{
       const row=document.createElement('div');row.className='entry-row';
       const kcal=entry.values[0]||0,prot=entry.values[1]||0,fat=entry.values[2]||0;
-      row.innerHTML=`<div class="entry-time">${entry.time}</div><div class="entry-summary"><strong>${Math.round(kcal)}kcal</strong> P:${prot}g F:${fat}g</div><div class="entry-actions"><button class="eib ed" onclick="openEditModal({date:'${date}',id:'${entry.id}'})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></button><button class="eib dl" onclick="confirmDelete('${date}','${entry.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`;
+      const correctedTag=entry.corrected?`<span class="leftover-tag">補正済</span>`:'';
+      row.innerHTML=`<div class="entry-time">${entry.time}</div><div class="entry-summary"><strong>${Math.round(kcal)}kcal</strong> P:${prot}g F:${fat}g ${correctedTag}</div><div class="entry-actions"><button class="eib lo" title="食べ残し補正" onclick="openLeftoverModal('${date}','${entry.id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button><button class="eib ed" onclick="openEditModal({date:'${date}',id:'${entry.id}'})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></button><button class="eib dl" onclick="confirmDelete('${date}','${entry.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`;
       card.appendChild(row);
     });
     list.appendChild(card);
@@ -1174,8 +1296,8 @@ function showDr(id){
 }
 function closeAllDr(){
   document.getElementById('ov').classList.remove('open');
-  ['drEdit','drNutrient','drTarget'].forEach(id=>document.getElementById(id).classList.remove('open'));
-  activeDr=null;editTarget=null;
+  ['drEdit','drNutrient','drTarget','drLeftover'].forEach(id=>document.getElementById(id).classList.remove('open'));
+  activeDr=null;editTarget=null;leftoverTarget=null;
 }
 
 // ── CONFIRM ──
