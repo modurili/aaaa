@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="栄養ログ">
+<meta name="apple-mobile-web-app-title" content="たべぐら">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#121212" id="metaTheme">
 <link rel="manifest" id="manifestLink">
-<title>栄養ログ</title>
+<title>たべぐら</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
@@ -129,15 +129,22 @@ canvas { display:block; }
 .rep-hl { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--text2); margin-bottom:5px; }
 .rep-hv { font-family:'DM Mono',monospace; font-size:20px; font-weight:500; color:var(--text); line-height:1; }
 .rep-hsub { font-size:10px; color:var(--text3); margin-top:3px; }
-.rep-chart-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--rs); padding:14px; margin-bottom:8px; }
-.rep-chart-title { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--text2); margin-bottom:12px; }
-.rep-bars { display:flex; align-items:flex-end; gap:5px; height:80px; }
-.rep-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; height:100%; }
-.rep-bar-bg { width:100%; flex:1; background:var(--bg3); border-radius:4px; position:relative; overflow:hidden; }
-.rep-bar-fill { position:absolute; bottom:0; left:0; right:0; border-radius:4px; background:linear-gradient(0deg,var(--accent),var(--accent2)); }
-.rep-bar-fill.today { background:linear-gradient(0deg,#f59e0b,#fbbf24); }
-.rep-bar-lbl { font-family:'DM Mono',monospace; font-size:8px; color:var(--text2); }
-.rep-bar-val { font-family:'DM Mono',monospace; font-size:8px; color:var(--text3); min-height:10px; }
+/* REPORT – new trend layout */
+.rep-nutrient-selector { margin-bottom:8px; }
+.rep-nutrient-scroll { display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+.rep-nutrient-scroll::-webkit-scrollbar { display:none; }
+.rep-n-btn { flex-shrink:0; padding:6px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--bg2); font-family:'DM Mono',monospace; font-size:11px; color:var(--text2); transition:all .15s; white-space:nowrap; }
+.rep-n-btn.active { border-color:var(--accent); color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,transparent); }
+.rep-n-btn:active { transform:scale(.94); }
+.rep-trend-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--rs); padding:14px; margin-bottom:8px; }
+.rep-trend-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12px; }
+.rep-trend-unit { font-size:11px; color:var(--text3); margin-top:3px; }
+.rep-trend-stat { text-align:right; }
+.rep-trend-avg { font-family:'DM Mono',monospace; font-size:20px; font-weight:500; color:var(--text); line-height:1.1; }
+.rep-trend-pct { font-family:'DM Mono',monospace; font-size:11px; margin-left:4px; }
+.rep-trend-canvas-wrap { overflow:hidden; }
+/* keep old table styles */
+.rep-chart-title { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text2); }
 .rep-table-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--rs); overflow:hidden; margin-bottom:8px; }
 .rep-table-title { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--text2); padding:11px 14px 7px; border-bottom:1px solid var(--border); }
 .rep-day-group { border-bottom:1px solid var(--border); }
@@ -250,6 +257,17 @@ canvas { display:block; }
 .mode-btn.on { border-color:var(--accent); color:var(--accent); background:color-mix(in srgb,var(--accent) 8%,transparent); }
 .mode-hint { font-size:11px; color:var(--text3); text-align:center; margin:0 14px 10px; }
 
+/* COMMENT CARD */
+.comment-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--r); padding:14px 16px; margin-bottom:10px; box-shadow:var(--sh2); display:flex; align-items:flex-start; gap:12px; min-height:60px; position:relative; overflow:hidden; }
+.comment-card::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; background:var(--accent); opacity:.05; pointer-events:none; }
+.comment-icon { font-size:26px; flex-shrink:0; line-height:1; margin-top:1px; }
+.comment-body { flex:1; }
+.comment-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--text3); margin-bottom:4px; }
+.comment-text { font-size:13.5px; color:var(--text); line-height:1.6; font-weight:500; }
+.comment-sub { font-size:11px; color:var(--text3); margin-top:4px; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+.comment-card { animation:fadeIn .3s ease; }
+
 /* CONFIRM */
 .confirm-ov { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:300; display:none; align-items:center; justify-content:center; padding:24px; }
 .confirm-ov.open { display:flex; }
@@ -276,7 +294,7 @@ canvas { display:block; }
     <!-- HOME -->
     <div class="page active" id="pg-home">
       <div class="pg-hd">
-        <div class="app-nm">栄養ログ</div>
+        <div class="app-nm">たべぐら</div>
         <div class="hd-right">
           <button class="install-btn" id="installBtn" onclick="installPWA()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="6" x2="12" y2="14"/><polyline points="9 11 12 14 15 11"/></svg>
@@ -298,6 +316,15 @@ canvas { display:block; }
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
             表示栄養素
           </button>
+        </div>
+        <!-- Today's comment card -->
+        <div class="comment-card" id="commentCard" style="display:none">
+          <div class="comment-icon" id="commentIcon">🍽</div>
+          <div class="comment-body">
+            <div class="comment-label">今日のひとこと</div>
+            <div class="comment-text" id="commentText">記録を分析中…</div>
+            <div class="comment-sub" id="commentSub"></div>
+          </div>
         </div>
         <div class="gauge-card" id="gaugeCard">
           <div class="gauge-header">
@@ -362,7 +389,7 @@ canvas { display:block; }
       <div class="pg-hd"><div class="pg-ti">マイページ</div></div>
       <div class="my-av-wrap">
         <div class="my-av"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-        <div class="my-un">栄養ログユーザー</div>
+        <div class="my-un">たべぐらユーザー</div>
         <div class="my-sb">毎日の食事を記録しています</div>
       </div>
       <div class="my-sec">
@@ -582,6 +609,7 @@ const SIMPLE_TARGETS={
   }
 };
 const CHANGELOG=[
+  {v:'2.3.0',note:'アプリ名を「たべぐら」に変更。ホームに今日の栄養状況から生成される「今日のひとこと」カードを追加。レポートを全面刷新——栄養素ごとの週推移折れ線グラフ（目標ライン付き）を実装。表示栄養素のタブで切替可能。'},
   {v:'2.2.0',note:'食べ残し補正機能を追加。食べ残しの写真をGeminiで分析し、その結果をワンタップで貼り付けると元の記録から自動的に差し引かれます。記録一覧の並び順を新しい記録が上にくるよう修正。'},
   {v:'2.1.0',note:'グラフ視認性向上（テキスト色・アクセントカラー適用）。栄養素を「目標に近づける」「上限を超えない」の2タイプに分類し、グラフの色分けとUIを最適化。日曜/月曜始まり設定をマイページに追加。PWAマニフェストを動的生成に対応。'},
   {v:'2.0.0',note:'UI完全刷新。ねむろく風デザイン採用。クリップボード記録、SVGアイコン統一、PWA対応、アクセントカラー選択（ねむろく同色6色）、マイページ強化、バージョン履歴追加。'},
@@ -654,9 +682,9 @@ function toast(msg){
 function setupManifest(){
   const accent=ACCENTS[currentAccent]||ACCENTS.green;
   const manifest={
-    name:'栄養ログ',short_name:'栄養ログ',display:'standalone',
+    name:'たべぐら',short_name:'たべぐら',display:'standalone',
     background_color:'#121212',theme_color:accent.hex,start_url:'.',
-    icons:[{src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="'+encodeURIComponent(accent.hex)+'"/><text y=".9em" font-size="80" x="10">🥗</text></svg>',sizes:'any',type:'image/svg+xml'}]
+    icons:[{src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="'+encodeURIComponent(accent.hex)+'"/><text y=".9em" font-size="80" x="10">🍽</text></svg>',sizes:'any',type:'image/svg+xml'}]
   };
   const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
@@ -694,7 +722,116 @@ function addMealEntry(values,time){
   if(!mealData[date])mealData[date]=[];
   mealData[date].push({id:genId(),time:time||nowTime(),values});
   saveMealData();currentViewDate=date;
-  toast('✅ 記録しました');renderGauge();
+  toast('✅ 記録しました');renderGauge();renderComment();
+}
+
+// ── TODAY'S COMMENT ──
+// Pools of comments indexed by nutritional situation
+const COMMENT_POOL={
+  noRecord:[
+    {icon:'🍽',text:'今日はまだ記録がありません。',sub:'食事したらGeminiで分析して記録しよう！'},
+    {icon:'📱',text:'今日の最初の記録をつけよう。',sub:'クリップボードから一発で記録できます'},
+  ],
+  // kcal達成率ベース
+  kcalLow:[
+    {icon:'⚡',text:'カロリーが少し不足気味です。',sub:'エネルギー補給を忘れずに'},
+    {icon:'🫙',text:'まだエネルギーに余裕があります。',sub:'次の食事でしっかり補いましょう'},
+    {icon:'🌱',text:'今日のカロリーはまだ余裕あり。',sub:'バランスよく食べていきましょう'},
+  ],
+  kcalGood:[
+    {icon:'✨',text:'カロリーは目標に近づいています！',sub:'バランスよく摂れていますね'},
+    {icon:'🎯',text:'いい感じのカロリー摂取です。',sub:'このペースを保っていきましょう'},
+    {icon:'💪',text:'エネルギー補給は順調です！',sub:'今日も良い一日になりそう'},
+  ],
+  kcalOver:[
+    {icon:'🔥',text:'今日はカロリーを多めに摂りました。',sub:'明日は少し意識してみましょう'},
+    {icon:'⚖️',text:'カロリーが目標を上回っています。',sub:'次の食事は軽めにしてみては？'},
+  ],
+  protLow:[
+    {icon:'🥩',text:'タンパク質が少し不足しています。',sub:'肉・魚・豆類を意識してみて'},
+    {icon:'🫘',text:'プロテインをもう少し摂りましょう。',sub:'筋肉の維持に大切な栄養素です'},
+  ],
+  protGood:[
+    {icon:'💪',text:'タンパク質はしっかり摂れています！',sub:'筋肉の維持に役立っています'},
+    {icon:'🥚',text:'タンパク質の摂取が順調です。',sub:'体づくりに貢献していますよ'},
+  ],
+  fiberLow:[
+    {icon:'🥦',text:'食物繊維が少し足りません。',sub:'野菜・きのこ・海藻を意識して'},
+    {icon:'🌾',text:'食物繊維を意識して摂りましょう。',sub:'腸内環境を整えるのに大切です'},
+  ],
+  sodiumHigh:[
+    {icon:'🧂',text:'塩分が多めになっています。',sub:'水分をたくさん摂るといいですよ'},
+    {icon:'💧',text:'ナトリウムが目標に近づいています。',sub:'薄味の料理を意識してみては？'},
+  ],
+  balanced:[
+    {icon:'🌈',text:'今日の栄養バランスはとても良好です！',sub:'この調子で続けていきましょう'},
+    {icon:'⭐',text:'バランスよく食べられています。',sub:'素晴らしい食生活ですね'},
+    {icon:'🎉',text:'栄養バランスが整っています！',sub:'体が喜んでいそうですね'},
+  ],
+  earlyDay:[
+    {icon:'☀️',text:'今日も食事の記録をはじめましょう！',sub:'こまめな記録が栄養管理の第一歩'},
+    {icon:'🌅',text:'おはようございます！',sub:'今日の食事記録をスタートしましょう'},
+  ],
+  evening:[
+    {icon:'🌙',text:'今日一日の記録お疲れさまでした。',sub:'明日もバランスよく食べましょう'},
+    {icon:'🛁',text:'今日の食事記録を振り返ってみましょう。',sub:'レポートタブで週の傾向が見えます'},
+  ],
+};
+
+function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function generateComment(){
+  const date=todayStr();
+  const entries=mealData[date]||[];
+  if(!entries.length) return pickRandom(COMMENT_POOL.noRecord);
+
+  const totals=new Array(20).fill(0);
+  entries.forEach(e=>e.values.forEach((v,i)=>totals[i]+=v));
+  const tgts=targets||{};
+  const kcalTgt=tgts.calorie||2000;
+  const protTgt=tgts.protein||65;
+  const fiberTgt=tgts.fiber||20;
+  const sodiumTgt=tgts.sodium||7.5;
+
+  const kcalRatio=totals[0]/kcalTgt;
+  const protRatio=totals[1]/protTgt;
+  const fiberRatio=totals[5]/fiberTgt;
+  const sodiumRatio=totals[9]/sodiumTgt;
+
+  const hour=new Date().getHours();
+
+  // Priority logic: most notable situation wins
+  if(hour<10) return pickRandom(COMMENT_POOL.earlyDay);
+  if(hour>=21) return pickRandom(COMMENT_POOL.evening);
+
+  // Check most noteworthy condition
+  if(sodiumRatio>0.9) return pickRandom(COMMENT_POOL.sodiumHigh);
+  if(kcalRatio>1.1)   return pickRandom(COMMENT_POOL.kcalOver);
+  if(protRatio<0.5)   return pickRandom(COMMENT_POOL.protLow);
+  if(fiberRatio<0.4)  return pickRandom(COMMENT_POOL.fiberLow);
+  if(kcalRatio<0.4)   return pickRandom(COMMENT_POOL.kcalLow);
+
+  // balanced / good state
+  const goodCount=[kcalRatio,protRatio,fiberRatio].filter(r=>r>=0.7&&r<=1.15).length;
+  if(goodCount>=2){
+    if(protRatio>=0.85) return pickRandom(COMMENT_POOL.protGood);
+    return pickRandom(COMMENT_POOL.balanced);
+  }
+  if(kcalRatio>=0.7&&kcalRatio<=1.1) return pickRandom(COMMENT_POOL.kcalGood);
+  return pickRandom(COMMENT_POOL.kcalLow);
+}
+
+function renderComment(){
+  const card=document.getElementById('commentCard');
+  const comment=generateComment();
+  document.getElementById('commentIcon').textContent=comment.icon;
+  document.getElementById('commentText').textContent=comment.text;
+  document.getElementById('commentSub').textContent=comment.sub||'';
+  card.style.display='flex';
+  // Re-trigger animation
+  card.style.animation='none';
+  card.offsetHeight; // reflow
+  card.style.animation='fadeIn .3s ease';
 }
 
 // ── EDIT MODAL ──
@@ -1061,55 +1198,180 @@ function getWeekDays(baseDate){
     pg.addEventListener('touchend',onEnd,{passive:true});
   },{once:true});
 })();
+let repChart=null;
+let repNutrientIdx=0; // which nutrient trend to show
+
 function renderReport(){
   const today=new Date();today.setHours(0,0,0,0);
   const base=new Date(today);base.setDate(base.getDate()+repWkOff*7);
   const days=getWeekDays(base);
   const todayStr2=fD(new Date());
-  document.getElementById('repTitle').textContent=repWkOff===0?'今週のレポート':repWkOff===-1?'先週のレポート':`${MON[days[0].getMonth()]} ${days[0].getDate()}日〜${days[6].getDate()}日`;
-  const dayKcals=days.map(d=>(mealData[fD(d)]||[]).reduce((s,e)=>s+(e.values[0]||0),0));
+
+  const weekLabel=repWkOff===0?'今週':repWkOff===-1?'先週':`${MON[days[0].getMonth()]} ${days[0].getDate()}〜${days[6].getDate()}日`;
+  document.getElementById('repTitle').textContent=weekLabel+'のレポート';
+
+  // Compute daily totals for all 20 nutrients
+  const dayTotals=days.map(d=>{
+    const entries=mealData[fD(d)]||[];
+    const t=new Array(20).fill(0);
+    entries.forEach(e=>e.values.forEach((v,i)=>t[i]+=v));
+    return t;
+  });
+
+  const dayKcals=dayTotals.map(t=>t[0]);
   const activeDays=dayKcals.filter(v=>v>0);
   const avgKcal=activeDays.length?Math.round(activeDays.reduce((a,v)=>a+v,0)/activeDays.length):0;
-  const maxKcal=activeDays.length?Math.max(...activeDays):0;
-  const maxBar=Math.max(...dayKcals,500);
+  const activeDayCount=activeDays.length;
+  const totalEntries=days.reduce((s,d)=>s+(mealData[fD(d)]||[]).length,0);
+
   const c=document.getElementById('repContent');c.innerHTML='';
+
+  // ── Hero stats ──
   const hero=document.createElement('div');hero.className='rep-hero';
+  // weekly avg kcal vs target
+  const kcalTgt=targets?.calorie||2000;
+  const kcalRatioAvg=avgKcal&&kcalTgt?Math.round(avgKcal/kcalTgt*100):0;
   hero.innerHTML=`
-    <div class="rep-hcard"><div class="rep-hl">平均カロリー</div><div class="rep-hv">${avgKcal?avgKcal+'kcal':'—'}</div><div class="rep-hsub">記録${activeDays.length}日分</div></div>
-    <div class="rep-hcard"><div class="rep-hl">最大カロリー</div><div class="rep-hv">${maxKcal?Math.round(maxKcal)+'kcal':'—'}</div><div class="rep-hsub">今週の最大値</div></div>
-    <div class="rep-hcard"><div class="rep-hl">記録日数</div><div class="rep-hv">${activeDays.length}<span style="font-size:14px;color:var(--text3)">/7</span></div><div class="rep-hsub">今週</div></div>
-    <div class="rep-hcard"><div class="rep-hl">総記録数</div><div class="rep-hv">${days.reduce((s,d)=>s+(mealData[fD(d)]||[]).length,0)}</div><div class="rep-hsub">食事エントリー</div></div>
+    <div class="rep-hcard"><div class="rep-hl">平均カロリー/日</div><div class="rep-hv">${avgKcal||'—'}<span style="font-size:12px;color:var(--text3)">${avgKcal?'kcal':''}</span></div><div class="rep-hsub">目標比 ${kcalRatioAvg||'—'}%</div></div>
+    <div class="rep-hcard"><div class="rep-hl">記録日数</div><div class="rep-hv">${activeDayCount}<span style="font-size:14px;color:var(--text3)">/7</span></div><div class="rep-hsub">${totalEntries}回の食事</div></div>
   `;
   c.appendChild(hero);
-  const chartCard=document.createElement('div');chartCard.className='rep-chart-card';
-  chartCard.innerHTML=`<div class="rep-chart-title">曜日別カロリー</div><div class="rep-bars" id="repBars"></div>`;
-  c.appendChild(chartCard);
-  const barsEl=chartCard.querySelector('#repBars');
-  days.forEach((d,i)=>{
-    const isT=fD(d)===todayStr2;const kcal=dayKcals[i];const pct=kcal?Math.min(100,(kcal/maxBar)*100):0;
-    const wrap=document.createElement('div');wrap.className='rep-bar-wrap';
-    const valEl=document.createElement('div');valEl.className='rep-bar-val';valEl.textContent=kcal?Math.round(kcal):'';
-    const bgEl=document.createElement('div');bgEl.className='rep-bar-bg';
-    const fillEl=document.createElement('div');fillEl.className='rep-bar-fill'+(isT?' today':'');
-    fillEl.dataset.pct=String(pct);fillEl.style.height='0px';bgEl.appendChild(fillEl);
-    const lblEl=document.createElement('div');lblEl.className='rep-bar-lbl';lblEl.textContent=DAY[d.getDay()];
-    wrap.appendChild(valEl);wrap.appendChild(bgEl);wrap.appendChild(lblEl);barsEl.appendChild(wrap);
+
+  // ── Nutrient selector tabs ──
+  // Show active nutrients only; first active one selected by default
+  const displayNutrients=NUTRIENTS.map((n,i)=>({...n,idx:i})).filter(n=>activeNutrients.includes(n.idx));
+  if(!displayNutrients.find(n=>n.idx===repNutrientIdx)) repNutrientIdx=displayNutrients[0]?.idx??0;
+
+  const selectorWrap=document.createElement('div');selectorWrap.className='rep-nutrient-selector';
+  const selectorScroll=document.createElement('div');selectorScroll.className='rep-nutrient-scroll';
+  displayNutrients.forEach(n=>{
+    const btn=document.createElement('button');
+    btn.className='rep-n-btn'+(n.idx===repNutrientIdx?' active':'');
+    btn.textContent=n.name;
+    btn.onclick=()=>{repNutrientIdx=n.idx;renderReport();};
+    selectorScroll.appendChild(btn);
   });
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    barsEl.querySelectorAll('.rep-bar-bg').forEach(bg=>{
-      const fill=bg.querySelector('.rep-bar-fill');if(!fill)return;
-      const pct=parseFloat(fill.dataset.pct||'0');
-      const h=bg.getBoundingClientRect().height;
-      fill.style.transition='height .5s cubic-bezier(.34,1.3,.64,1)';
-      fill.style.height=(pct/100*h)+'px';
+  selectorWrap.appendChild(selectorScroll);
+  c.appendChild(selectorWrap);
+
+  // ── Trend chart ──
+  const selNutrient=NUTRIENTS[repNutrientIdx];
+  const trendData=dayTotals.map(t=>+(t[repNutrientIdx].toFixed(2)));
+  const trendTarget=targets?.[TARGET_KEYS[repNutrientIdx]]||0;
+  const trendLabels=days.map(d=>{const isT=fD(d)===todayStr2;return DAY[d.getDay()]+(isT?'(今)':'');});
+
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const accentHex=(ACCENTS[currentAccent]||ACCENTS.green).hex;
+  const accent2Hex=(ACCENTS[currentAccent]||ACCENTS.green).hex2;
+  const tickC=isDark?'#c8c8c8':'#2e3250';
+  const gridC=isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.07)';
+
+  const chartCard=document.createElement('div');chartCard.className='rep-trend-card';
+  chartCard.innerHTML=`
+    <div class="rep-trend-header">
+      <div>
+        <div class="rep-chart-title">${selNutrient.name}の推移</div>
+        <div class="rep-trend-unit">${selNutrient.unit}${trendTarget?` ／ 目標: ${trendTarget}${selNutrient.unit}`:''}</div>
+      </div>
+      <div class="rep-trend-stat" id="repTrendStat"></div>
+    </div>
+    <div class="rep-trend-canvas-wrap"><canvas id="repTrendCanvas"></canvas></div>
+  `;
+  c.appendChild(chartCard);
+
+  // Stat summary
+  const nonZero=trendData.filter(v=>v>0);
+  const trendAvg=nonZero.length?+(nonZero.reduce((a,v)=>a+v,0)/nonZero.length).toFixed(1):0;
+  const statEl=chartCard.querySelector('#repTrendStat');
+  if(trendAvg){
+    const pct=trendTarget?Math.round(trendAvg/trendTarget*100):null;
+    const pctTag=pct!=null?`<span class="rep-trend-pct" style="color:${pct>=80&&pct<=120?accentHex:pct>120?'#f59e0b':'#6b7280'}">${pct}%</span>`:'';
+    statEl.innerHTML=`<div class="rep-trend-avg">${trendAvg}<span style="font-size:11px;color:var(--text3)">${selNutrient.unit}</span></div><div style="font-size:10px;color:var(--text3)">週平均 ${pctTag}</div>`;
+  }
+
+  // Draw chart after DOM append
+  requestAnimationFrame(()=>{
+    const canvas=document.getElementById('repTrendCanvas');if(!canvas)return;
+    const w=canvas.parentElement.clientWidth-16;
+    canvas.width=w;canvas.height=200;
+
+    if(repChart){repChart.destroy();repChart=null;}
+
+    const datasets=[{
+      label:selNutrient.name,
+      data:trendData,
+      borderColor:accentHex,
+      backgroundColor:(ctx)=>{
+        const g=ctx.chart.ctx.createLinearGradient(0,0,0,200);
+        g.addColorStop(0,accentHex+'55');g.addColorStop(1,accentHex+'00');
+        return g;
+      },
+      fill:true,
+      tension:.4,
+      pointBackgroundColor:days.map(d=>fD(d)===todayStr2?accentHex:'transparent'),
+      pointBorderColor:accentHex,
+      pointBorderWidth:2,
+      pointRadius:days.map(d=>fD(d)===todayStr2?6:4),
+      pointHoverRadius:7,
+    }];
+    if(trendTarget){
+      datasets.push({
+        label:'目標',
+        data:new Array(7).fill(trendTarget),
+        borderColor:isDark?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.15)',
+        borderDash:[5,4],
+        borderWidth:1.5,
+        pointRadius:0,
+        fill:false,
+        tension:0,
+      });
+    }
+
+    repChart=new Chart(canvas,{
+      type:'line',
+      data:{labels:trendLabels,datasets},
+      options:{
+        responsive:false,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            backgroundColor:isDark?'#2a2a2a':'#fff',
+            borderColor:isDark?'#444':'#ddd',borderWidth:1,
+            titleColor:isDark?'#e5e5e5':'#1a1d2e',
+            bodyColor:isDark?'#c8c8c8':'#4a4f6a',
+            titleFont:{family:'Syne',weight:'700',size:12},
+            bodyFont:{family:'DM Mono',size:11},
+            padding:10,
+            callbacks:{
+              label(ctx){
+                if(ctx.datasetIndex===1)return`目標: ${trendTarget}${selNutrient.unit}`;
+                const v=ctx.raw;
+                const pct=trendTarget&&v?Math.round(v/trendTarget*100)+'%':'';
+                return`${v}${selNutrient.unit}${pct?' ('+pct+')':''}`;
+              }
+            }
+          }
+        },
+        scales:{
+          x:{grid:{color:gridC},border:{display:false},ticks:{color:tickC,font:{family:'DM Mono',size:11}}},
+          y:{
+            grid:{color:gridC},border:{display:false},
+            ticks:{color:tickC,font:{family:'DM Mono',size:10},callback:v=>`${v}${selNutrient.unit.length<=2?selNutrient.unit:''}`},
+            suggestedMin:0,
+          }
+        }
+      }
     });
-  }));
+  });
+
+  // ── Day-by-day table ──
   const tableCard=document.createElement('div');tableCard.className='rep-table-card';
   tableCard.innerHTML=`<div class="rep-table-title">日別ログ</div>`;
   days.forEach(d=>{
     const ds=fD(d);const isT=ds===todayStr2;
     const entries=(mealData[ds]||[]).sort((a,b)=>a.time.localeCompare(b.time));
-    const dayKcal=dayKcals[days.indexOf(d)];
+    const dayKcal=dayTotals[days.indexOf(d)][0];
     const grp=document.createElement('div');grp.className='rep-day-group';
     grp.innerHTML=`<div class="rep-day-hd"><span class="rep-day-name">${DAY[d.getDay()]} ${d.getDate()}日${isT?' (今日)':''}</span>${dayKcal?`<span class="rep-day-kcal">${Math.round(dayKcal)}kcal</span>`:''}</div>`;
     if(entries.length){
@@ -1344,6 +1606,7 @@ window.addEventListener('appinstalled',()=>{document.getElementById('installBtn'
   document.getElementById('todaySub').textContent='今日の記録';
   document.getElementById('gaugeDateBadge').textContent='今日';
   renderGauge();
+  renderComment();
 })();
 </script>
 </body>
